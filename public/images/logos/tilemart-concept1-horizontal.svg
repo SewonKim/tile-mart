@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 60" role="img" aria-labelledby="logo-title1">
+  <title id="logo-title1">타일마트 로고</title>
+  <defs>
+    <style>
+      .tm-primary { fill: #55c89f; }
+      .tm-dark { fill: #222222; }
+      .tm-light { fill: #ffffff; }
+    </style>
+  </defs>
+
+  <!-- 타일 그리드 아이콘 (4칸 타일 모티프) -->
+  <g id="icon">
+    <rect class="tm-primary" x="2" y="2" width="24" height="24" rx="3"/>
+    <rect class="tm-primary" x="30" y="2" width="24" height="24" rx="3" opacity="0.7"/>
+    <rect class="tm-primary" x="2" y="30" width="24" height="24" rx="3" opacity="0.7"/>
+    <rect class="tm-primary" x="30" y="30" width="24" height="24" rx="3" opacity="0.4"/>
+  </g>
+
+  <!-- 워드마크 -->
+  <g id="wordmark">
+    <text x="72" y="40" font-family="'Pretendard', 'Apple SD Gothic Neo', sans-serif" font-size="32" font-weight="800" class="tm-dark">
+      타일마트
+    </text>
+  </g>
+</svg>

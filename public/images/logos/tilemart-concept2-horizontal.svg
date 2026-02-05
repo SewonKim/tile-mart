@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 60" role="img" aria-labelledby="logo-title2">
+  <title id="logo-title2">타일마트 로고</title>
+  <defs>
+    <linearGradient id="grad-c2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#55c89f;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#3daf86;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- T자 타일 블록 아이콘 -->
+  <g id="icon">
+    <rect fill="url(#grad-c2)" x="0" y="0" width="56" height="56" rx="12"/>
+    <!-- T 레터마크 (타일 패턴 느낌) -->
+    <rect x="12" y="10" width="32" height="7" rx="1.5" fill="#fff"/>
+    <rect x="24" y="10" width="8" height="36" rx="1.5" fill="#fff"/>
+    <!-- 작은 타일 악센트 -->
+    <rect x="12" y="40" width="8" height="7" rx="1.5" fill="#fff" opacity="0.5"/>
+    <rect x="36" y="40" width="8" height="7" rx="1.5" fill="#fff" opacity="0.5"/>
+  </g>
+
+  <!-- 워드마크 -->
+  <g id="wordmark">
+    <text x="68" y="27" font-family="'Pretendard', 'Apple SD Gothic Neo', sans-serif" font-size="28" font-weight="800" fill="#222222">
+      타일마트
+    </text>
+    <text x="68" y="48" font-family="'Pretendard', 'Apple SD Gothic Neo', sans-serif" font-size="13" font-weight="500" fill="#888888" letter-spacing="3">
+      TILE MART
+    </text>
+  </g>
+</svg>
