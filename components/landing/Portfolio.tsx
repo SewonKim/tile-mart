@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowRight, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -138,7 +139,8 @@ export function Portfolio() {
         {/* 프로젝트 그리드 */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {filtered.map((project) => (
-            <div
+            <Link
+              href={`/portfolio/${project.id}`}
               key={project.id}
               className="group cursor-pointer overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-border/50 transition-all hover:-translate-y-1 hover:shadow-lg"
             >
@@ -167,7 +169,7 @@ export function Portfolio() {
                   {project.cost}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Building2,
   GraduationCap,
@@ -24,6 +25,7 @@ const services = [
     icon: Building2,
     title: "사무실",
     subtitle: "OFFICE",
+    slug: "office",
     description: "공간이 바뀌면, 일이 달라집니다",
     image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop",
     color: "#55c89f",
@@ -32,6 +34,7 @@ const services = [
     icon: GraduationCap,
     title: "학원",
     subtitle: "ACADEMY",
+    slug: "academy",
     description: "집중력을 높이는 교육 공간",
     image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&h=600&fit=crop",
     color: "#4BA3E3",
@@ -40,6 +43,7 @@ const services = [
     icon: Dumbbell,
     title: "체육시설",
     subtitle: "FITNESS",
+    slug: "fitness",
     description: "몰입할 수 있는 운동 환경",
     image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
     color: "#E8734A",
@@ -48,6 +52,7 @@ const services = [
     icon: Home,
     title: "주거건물",
     subtitle: "RESIDENTIAL",
+    slug: "residential",
     description: "삶의 질을 높이는 주거 공간",
     image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",
     color: "#D4A853",
@@ -56,6 +61,7 @@ const services = [
     icon: Wrench,
     title: "환경개선",
     subtitle: "RENOVATION",
+    slug: "renovation",
     description: "노후 공간의 새로운 탈바꿈",
     image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&h=600&fit=crop",
     color: "#8B7EC8",
@@ -64,6 +70,7 @@ const services = [
     icon: Store,
     title: "매장",
     subtitle: "RETAIL",
+    slug: "retail",
     description: "브랜드를 담은 매장 설계",
     image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop",
     color: "#E05D8C",
@@ -72,6 +79,7 @@ const services = [
     icon: Coffee,
     title: "카페 · 음식점",
     subtitle: "F&B",
+    slug: "fnb",
     description: "다시 찾고 싶은 경험 공간",
     image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop",
     color: "#55c89f",
@@ -166,7 +174,8 @@ export function Services() {
           {/* 벤토 그리드 */}
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" style={{ gridAutoRows: "220px" }}>
             {services.map((service, i) => (
-              <div
+              <Link
+                href={`/services/${service.slug}`}
                 key={service.title}
                 onMouseEnter={() => setHoveredIndex(i)}
                 onMouseLeave={() => setHoveredIndex(null)}
@@ -252,7 +261,7 @@ export function Services() {
                     />
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
