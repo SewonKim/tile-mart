@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { generateSlug } from '@/lib/validators'
 import type { Service, ServiceFeature } from '@/lib/types'
 import { Plus, X } from 'lucide-react'
+import { ImageUpload } from '@/components/admin/ui/ImageUpload'
 
 interface ServiceFormProps {
   service?: Service | null
@@ -104,11 +105,16 @@ export function ServiceForm({ service, existingFeatures, onSubmit, saving }: Ser
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} required rows={4} className={inputClass} />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label className="mb-1.5 block text-sm font-medium">이미지 URL</label>
-            <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className={inputClass} placeholder="https://..." />
-          </div>
+        <div className="rounded-xl border border-border bg-white p-4 space-y-4">
+          <ImageUpload
+            value={imageUrl}
+            onChange={setImageUrl}
+            folder="services"
+            label="서비스 이미지"
+          />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-sm font-medium">브랜드 컬러</label>
             <div className="flex gap-2">
@@ -121,6 +127,7 @@ export function ServiceForm({ service, existingFeatures, onSubmit, saving }: Ser
             <input type="number" value={sortOrder} onChange={(e) => setSortOrder(Number(e.target.value))} className={inputClass} min={0} />
           </div>
         </div>
+
 
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="accent-primary" />

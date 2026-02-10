@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { generateSlug } from '@/lib/validators'
 import type { Portfolio, PortfolioImage, Tag, Service } from '@/lib/types'
-import { Plus, X, GripVertical } from 'lucide-react'
+import { ImageUpload } from '@/components/admin/ui/ImageUpload'
+import { MultiImageUpload } from '@/components/admin/ui/MultiImageUpload'
 
 interface PortfolioFormProps {
   portfolio?: Portfolio | null
@@ -58,23 +59,12 @@ export function PortfolioForm({
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
     existingTags?.map((t) => t.tag_id) || []
   )
-  const [newImageUrl, setNewImageUrl] = useState('')
 
   function handleTitleChange(val: string) {
     setTitle(val)
     if (!portfolio) {
       setSlug(generateSlug(val))
     }
-  }
-
-  function addImage() {
-    if (!newImageUrl.trim()) return
-    setImages((prev) => [...prev, { url: newImageUrl.trim(), alt: '' }])
-    setNewImageUrl('')
-  }
-
-  function removeImage(idx: number) {
-    setImages((prev) => prev.filter((_, i) => i !== idx))
   }
 
   function toggleTag(tagId: number) {
@@ -165,15 +155,9 @@ export function PortfolioForm({
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="mb-1.5 block text-sm font-medium">시공완료일</label>
-            <input type="date" value={completedAt} onChange={(e) => setCompletedAt(e.target.value)} className={inputClass} />
-          </div>
-          <div>
-            <label className="mb-1.5 block text-sm font-medium">대표 이미지 URL</label>
-            <input value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} className={inputClass} placeholder="https://..." />
-          </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-medium">시공완료일</label>
+          <input type="date" value={completedAt} onChange={(e) => setCompletedAt(e.target.value)} className={cn(inputClass, 'max-w-xs')} />
         </div>
 
         <div className="flex gap-6">
@@ -188,34 +172,24 @@ export function PortfolioForm({
         </div>
       </div>
 
-      {/* Images */}
+      {/* 대표 이미지 */}
       <div className="rounded-xl border border-border bg-white p-6 space-y-4">
-        <h3 className="text-sm font-semibold text-foreground">갤러리 이미지</h3>
-        <div className="flex gap-2">
-          <input
-            value={newImageUrl}
-            onChange={(e) => setNewImageUrl(e.target.value)}
-            placeholder="이미지 URL 입력..."
-            className={cn(inputClass, 'flex-1')}
-            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addImage())}
-          />
-          <button type="button" onClick={addImage} className="rounded-lg bg-primary px-4 py-2 text-sm text-white hover:bg-primary-dark">
-            <Plus className="size-4" />
-          </button>
-        </div>
-        {images.length > 0 && (
-          <div className="space-y-2">
-            {images.map((img, idx) => (
-              <div key={idx} className="flex items-center gap-2 rounded-lg border border-border bg-muted-light p-2">
-                <GripVertical className="size-4 text-muted" />
-                <span className="flex-1 truncate text-sm">{img.url}</span>
-                <button type="button" onClick={() => removeImage(idx)} className="rounded p-1 hover:bg-red-50">
-                  <X className="size-3.5 text-red-400" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+        <ImageUpload
+          value={thumbnailUrl}
+          onChange={setThumbnailUrl}
+          folder="portfolios"
+          label="대표 이미지"
+        />
+      </div>
+
+      {/* 갤러리 이미지 */}
+      <div className="rounded-xl border border-border bg-white p-6 space-y-4">
+        <MultiImageUpload
+          images={images}
+          onChange={setImages}
+          folder="portfolios"
+          label="갤러리 이미지"
+        />
       </div>
 
       {/* Tags */}
