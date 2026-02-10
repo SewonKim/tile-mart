@@ -2,22 +2,17 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Ruler, Clock, Banknote, ChevronLeft, ChevronRight } from "lucide-react";
-import { projects } from "@/lib/data";
+import { getPublicPortfolioById, getAdjacentPortfolios } from "@/lib/actions/public";
 import { PortfolioGallery } from "./gallery";
 
-export function generateStaticParams() {
-  return projects.map((p) => ({ id: p.id }));
-}
-
-export function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  return params.then(({ id }) => {
-    const project = projects.find((p) => p.id === id);
-    if (!project) return {};
-    return {
-      title: `${project.title} | 타일마트 시공사례`,
-      description: project.description,
-    };
-  });
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const result = await getPublicPortfolioById(Number(id));
+  if (!result) return {};
+  return {
+    title: `${result.portfolio.title} | 타일마트 시공사례`,
+    description: result.portfolio.description,
+  };
 }
 
 export default async function PortfolioDetailPage({
@@ -26,12 +21,18 @@ export default async function PortfolioDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const project = projects.find((p) => p.id === id);
-  if (!project) notFound();
+  const portfolioId = Number(id);
+  const result = await getPublicPortfolioById(portfolioId);
+  if (!result) notFound();
 
-  const currentIndex = projects.findIndex((p) => p.id === id);
-  const prev = currentIndex > 0 ? projects[currentIndex - 1] : null;
-  const next = currentIndex < projects.length - 1 ? projects[currentIndex + 1] : null;
+  const { portfolio, images, tags } = result;
+  const { prev, next } = await getAdjacentPortfolios(portfolioId);
+
+  const imageUrls = images.map((img) => img.image_url);
+  // 썸네일이 있고, 이미지 목록에 없으면 맨 앞에 추가
+  if (portfolio.thumbnail_url && !imageUrls.includes(portfolio.thumbnail_url)) {
+    imageUrls.unshift(portfolio.thumbnail_url);
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -46,7 +47,7 @@ export default async function PortfolioDetailPage({
             시공사례 목록
           </Link>
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            {project.category}
+            {portfolio.service_name || (tags[0]?.name ?? "")}
           </span>
         </div>
       </div>
@@ -54,8 +55,8 @@ export default async function PortfolioDetailPage({
       {/* 히어로 이미지 */}
       <div className="relative h-[50vh] w-full md:h-[60vh]">
         <Image
-          src={project.images[0]}
-          alt={project.title}
+          src={imageUrls[0] || portfolio.thumbnail_url || ""}
+          alt={portfolio.title}
           fill
           className="object-cover"
           priority
@@ -64,7 +65,7 @@ export default async function PortfolioDetailPage({
         <div className="absolute inset-x-0 bottom-0 p-6 lg:p-10">
           <div className="mx-auto max-w-[1400px]">
             <h1 className="text-3xl font-extrabold text-white md:text-5xl">
-              {project.title}
+              {portfolio.title}
             </h1>
           </div>
         </div>
@@ -76,25 +77,16 @@ export default async function PortfolioDetailPage({
           {/* 왼쪽: 상세 정보 */}
           <div className="lg:col-span-2">
             <p className="text-lg leading-relaxed text-muted">
-              {project.description}
+              {portfolio.description}
             </p>
 
-            {/* 시공 포인트 */}
-            <h2 className="mb-4 mt-10 text-xl font-bold">시공 포인트</h2>
-            <ul className="space-y-3">
-              {project.details.map((detail, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="mt-1 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                    {i + 1}
-                  </span>
-                  <span className="text-foreground">{detail}</span>
-                </li>
-              ))}
-            </ul>
-
             {/* 갤러리 */}
-            <h2 className="mb-4 mt-12 text-xl font-bold">시공 사진</h2>
-            <PortfolioGallery images={project.images} title={project.title} />
+            {imageUrls.length > 0 && (
+              <>
+                <h2 className="mb-4 mt-12 text-xl font-bold">시공 사진</h2>
+                <PortfolioGallery images={imageUrls} title={portfolio.title} />
+              </>
+            )}
           </div>
 
           {/* 오른쪽: 정보 카드 */}
@@ -108,7 +100,7 @@ export default async function PortfolioDetailPage({
                   </div>
                   <div>
                     <p className="text-xs text-muted">위치</p>
-                    <p className="font-semibold">{project.location}</p>
+                    <p className="font-semibold">{portfolio.location}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -117,7 +109,7 @@ export default async function PortfolioDetailPage({
                   </div>
                   <div>
                     <p className="text-xs text-muted">면적</p>
-                    <p className="font-semibold">{project.area}</p>
+                    <p className="font-semibold">{portfolio.area}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -126,19 +118,34 @@ export default async function PortfolioDetailPage({
                   </div>
                   <div>
                     <p className="text-xs text-muted">시공비</p>
-                    <p className="font-semibold text-primary">{project.cost}</p>
+                    <p className="font-semibold text-primary">{portfolio.cost}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
-                    <Clock className="size-5 text-primary" />
+                {portfolio.duration && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
+                      <Clock className="size-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted">시공 기간</p>
+                      <p className="font-semibold">{portfolio.duration}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs text-muted">시공 기간</p>
-                    <p className="font-semibold">{project.duration}</p>
-                  </div>
-                </div>
+                )}
               </div>
+
+              {tags.length > 0 && (
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {tags.map((tag) => (
+                    <span
+                      key={tag.tag_id}
+                      className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               <Link
                 href="/#consultation"
@@ -156,7 +163,7 @@ export default async function PortfolioDetailPage({
         <div className="mx-auto grid max-w-[1400px] md:grid-cols-2">
           {prev ? (
             <Link
-              href={`/portfolio/${prev.id}`}
+              href={`/portfolio/${prev.portfolio_id}`}
               className="group flex items-center gap-4 border-b border-border px-6 py-8 transition-colors hover:bg-muted-light md:border-b-0 md:border-r lg:px-10"
             >
               <ChevronLeft className="size-5 text-muted transition-transform group-hover:-translate-x-1" />
@@ -170,7 +177,7 @@ export default async function PortfolioDetailPage({
           )}
           {next ? (
             <Link
-              href={`/portfolio/${next.id}`}
+              href={`/portfolio/${next.portfolio_id}`}
               className="group flex items-center justify-end gap-4 px-6 py-8 text-right transition-colors hover:bg-muted-light lg:px-10"
             >
               <div>

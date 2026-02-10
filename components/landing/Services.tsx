@@ -17,74 +17,19 @@ import {
   Palette,
   Shield,
   ArrowUpRight,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const services = [
-  {
-    icon: Building2,
-    title: "사무실",
-    subtitle: "OFFICE",
-    slug: "office",
-    description: "공간이 바뀌면, 일이 달라집니다",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop",
-    color: "#55c89f",
-  },
-  {
-    icon: GraduationCap,
-    title: "학원",
-    subtitle: "ACADEMY",
-    slug: "academy",
-    description: "집중력을 높이는 교육 공간",
-    image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&h=600&fit=crop",
-    color: "#4BA3E3",
-  },
-  {
-    icon: Dumbbell,
-    title: "체육시설",
-    subtitle: "FITNESS",
-    slug: "fitness",
-    description: "몰입할 수 있는 운동 환경",
-    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
-    color: "#E8734A",
-  },
-  {
-    icon: Home,
-    title: "주거건물",
-    subtitle: "RESIDENTIAL",
-    slug: "residential",
-    description: "삶의 질을 높이는 주거 공간",
-    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",
-    color: "#D4A853",
-  },
-  {
-    icon: Wrench,
-    title: "환경개선",
-    subtitle: "RENOVATION",
-    slug: "renovation",
-    description: "노후 공간의 새로운 탈바꿈",
-    image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&h=600&fit=crop",
-    color: "#8B7EC8",
-  },
-  {
-    icon: Store,
-    title: "매장",
-    subtitle: "RETAIL",
-    slug: "retail",
-    description: "브랜드를 담은 매장 설계",
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop",
-    color: "#E05D8C",
-  },
-  {
-    icon: Coffee,
-    title: "카페 · 음식점",
-    subtitle: "F&B",
-    slug: "fnb",
-    description: "다시 찾고 싶은 경험 공간",
-    image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop",
-    color: "#55c89f",
-  },
-];
+const iconMap: Record<string, LucideIcon> = {
+  office: Building2,
+  academy: GraduationCap,
+  fitness: Dumbbell,
+  residential: Home,
+  renovation: Wrench,
+  retail: Store,
+  fnb: Coffee,
+};
 
 const stats = [
   { icon: Award, value: "2,000+", label: "시공 실적", suffix: "건" },
@@ -93,6 +38,15 @@ const stats = [
   { icon: Palette, value: "7", label: "공간 디자이너", suffix: "명" },
   { icon: Shield, value: "14", label: "전담 PM", suffix: "명" },
 ];
+
+interface ServiceItem {
+  slug: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  image: string;
+  color: string;
+}
 
 function AnimatedNumber({ value, suffix }: { value: string; suffix: string }) {
   const [displayed, setDisplayed] = useState("0");
@@ -146,7 +100,7 @@ function AnimatedNumber({ value, suffix }: { value: string; suffix: string }) {
   );
 }
 
-export function Services() {
+export function Services({ services }: { services: ServiceItem[] }) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
@@ -173,96 +127,99 @@ export function Services() {
 
           {/* 벤토 그리드 */}
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" style={{ gridAutoRows: "220px" }}>
-            {services.map((service, i) => (
-              <Link
-                href={`/services/${service.slug}`}
-                key={service.title}
-                onMouseEnter={() => setHoveredIndex(i)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                className={cn(
-                  "group relative cursor-pointer overflow-hidden rounded-2xl transition-all duration-500",
-                  i === 0 && "sm:col-span-2 sm:row-span-2"
-                )}
-                style={i === 0 ? { gridRow: "span 2" } : undefined}
-              >
-                {/* 배경 이미지 */}
-                <Image
-                  src={service.image}
-                  alt={service.title}
-                  fill
+            {services.map((service, i) => {
+              const Icon = iconMap[service.slug] || Building2;
+              return (
+                <Link
+                  href={`/services/${service.slug}`}
+                  key={service.slug}
+                  onMouseEnter={() => setHoveredIndex(i)}
+                  onMouseLeave={() => setHoveredIndex(null)}
                   className={cn(
-                    "object-cover transition-all duration-700",
-                    hoveredIndex === i ? "scale-110" : "scale-100"
+                    "group relative cursor-pointer overflow-hidden rounded-2xl transition-all duration-500",
+                    i === 0 && "sm:col-span-2 sm:row-span-2"
                   )}
-                />
-
-                {/* 오버레이 그라데이션 */}
-                <div
-                  className={cn(
-                    "absolute inset-0 transition-all duration-500",
-                    hoveredIndex === i
-                      ? "bg-gradient-to-t from-black/90 via-black/50 to-black/10"
-                      : "bg-gradient-to-t from-black/80 via-black/30 to-transparent"
-                  )}
-                />
-
-                {/* 카테고리 뱃지 */}
-                <div className="absolute left-4 top-4 z-10">
-                  <span
-                    className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-md"
-                    style={{ backgroundColor: `${service.color}CC` }}
-                  >
-                    {service.subtitle}
-                  </span>
-                </div>
-
-                {/* 화살표 */}
-                <div
-                  className={cn(
-                    "absolute right-4 top-4 z-10 flex size-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md transition-all duration-300",
-                    hoveredIndex === i
-                      ? "translate-x-0 translate-y-0 opacity-100"
-                      : "translate-x-2 -translate-y-2 opacity-0"
-                  )}
+                  style={i === 0 ? { gridRow: "span 2" } : undefined}
                 >
-                  <ArrowUpRight className="size-4" />
-                </div>
+                  {/* 배경 이미지 */}
+                  <Image
+                    src={service.image}
+                    alt={service.title}
+                    fill
+                    className={cn(
+                      "object-cover transition-all duration-700",
+                      hoveredIndex === i ? "scale-110" : "scale-100"
+                    )}
+                  />
 
-                {/* 콘텐츠 */}
-                <div className="absolute inset-x-0 bottom-0 z-10 p-5">
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <h3
-                        className={cn(
-                          "font-bold text-white",
-                          i === 0 ? "text-2xl md:text-3xl" : "text-lg"
-                        )}
-                      >
-                        {service.title}
-                      </h3>
-                      <p
-                        className={cn(
-                          "mt-1 font-medium text-white/60 transition-all duration-300",
-                          hoveredIndex === i
-                            ? "translate-y-0 opacity-100"
-                            : "translate-y-2 opacity-0",
-                          i === 0 ? "text-base" : "text-sm"
-                        )}
-                      >
-                        {service.description}
-                      </p>
-                    </div>
-                    <service.icon
-                      className={cn(
-                        "shrink-0 text-white/20 transition-colors duration-300",
-                        hoveredIndex === i && "text-white/50",
-                        i === 0 ? "size-10" : "size-7"
-                      )}
-                    />
+                  {/* 오버레이 그라데이션 */}
+                  <div
+                    className={cn(
+                      "absolute inset-0 transition-all duration-500",
+                      hoveredIndex === i
+                        ? "bg-gradient-to-t from-black/90 via-black/50 to-black/10"
+                        : "bg-gradient-to-t from-black/80 via-black/30 to-transparent"
+                    )}
+                  />
+
+                  {/* 카테고리 뱃지 */}
+                  <div className="absolute left-4 top-4 z-10">
+                    <span
+                      className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-md"
+                      style={{ backgroundColor: `${service.color}CC` }}
+                    >
+                      {service.subtitle}
+                    </span>
                   </div>
-                </div>
-              </Link>
-            ))}
+
+                  {/* 화살표 */}
+                  <div
+                    className={cn(
+                      "absolute right-4 top-4 z-10 flex size-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md transition-all duration-300",
+                      hoveredIndex === i
+                        ? "translate-x-0 translate-y-0 opacity-100"
+                        : "translate-x-2 -translate-y-2 opacity-0"
+                    )}
+                  >
+                    <ArrowUpRight className="size-4" />
+                  </div>
+
+                  {/* 콘텐츠 */}
+                  <div className="absolute inset-x-0 bottom-0 z-10 p-5">
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <h3
+                          className={cn(
+                            "font-bold text-white",
+                            i === 0 ? "text-2xl md:text-3xl" : "text-lg"
+                          )}
+                        >
+                          {service.title}
+                        </h3>
+                        <p
+                          className={cn(
+                            "mt-1 font-medium text-white/60 transition-all duration-300",
+                            hoveredIndex === i
+                              ? "translate-y-0 opacity-100"
+                              : "translate-y-2 opacity-0",
+                            i === 0 ? "text-base" : "text-sm"
+                          )}
+                        >
+                          {service.description}
+                        </p>
+                      </div>
+                      <Icon
+                        className={cn(
+                          "shrink-0 text-white/20 transition-colors duration-300",
+                          hoveredIndex === i && "text-white/50",
+                          i === 0 ? "size-10" : "size-7"
+                        )}
+                      />
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -292,7 +249,7 @@ export function Services() {
           </div>
 
           <div className="grid grid-cols-2 gap-y-12 md:grid-cols-5 md:gap-8">
-            {stats.map((stat, i) => (
+            {stats.map((stat) => (
               <div key={stat.label} className="group text-center">
                 <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-white/[0.04] ring-1 ring-white/[0.06] transition-all group-hover:bg-primary/10 group-hover:ring-primary/20">
                   <stat.icon className="size-6 text-primary" />

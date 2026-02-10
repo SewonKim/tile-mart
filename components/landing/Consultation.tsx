@@ -1,17 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Phone, Send, Clock, MapPin, MessageCircle } from "lucide-react";
+import { Phone, Send, Clock, MapPin, MessageCircle, CheckCircle2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createConsultation } from "@/lib/actions/consultations";
 
 const spaceTypes = [
-  "사무실",
-  "학원",
-  "체육시설",
-  "주거공간",
-  "매장",
-  "카페/음식점",
-  "기타",
+  { label: "사무실", value: "office" },
+  { label: "학원", value: "academy" },
+  { label: "체육시설", value: "fitness" },
+  { label: "주거공간", value: "residential" },
+  { label: "매장", value: "retail" },
+  { label: "카페/음식점", value: "fnb" },
+  { label: "기타", value: "other" },
 ];
 
 export function Consultation() {
@@ -22,10 +23,35 @@ export function Consultation() {
     area: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("상담 신청이 완료되었습니다. 빠른 시일 내에 연락드리겠습니다.");
+    setIsSubmitting(true);
+    setResult(null);
+
+    try {
+      const res = await createConsultation({
+        name: formData.name,
+        phone: formData.phone,
+        space_type: formData.spaceType,
+        area: formData.area || undefined,
+        message: formData.message || undefined,
+        source: "website",
+      });
+
+      if (res.success) {
+        setResult({ success: true, message: "상담 신청이 완료되었습니다. 빠른 시일 내에 연락드리겠습니다." });
+        setFormData({ name: "", phone: "", spaceType: "", area: "", message: "" });
+      } else {
+        setResult({ success: false, message: res.error || "상담 신청에 실패했습니다. 다시 시도해주세요." });
+      }
+    } catch {
+      setResult({ success: false, message: "네트워크 오류가 발생했습니다. 다시 시도해주세요." });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -101,6 +127,25 @@ export function Consultation() {
           {/* 오른쪽: 폼 */}
           <div className="bg-white p-8 md:p-12 lg:p-16">
             <h3 className="mb-6 text-xl font-bold">상담 신청서</h3>
+
+            {result && (
+              <div
+                className={cn(
+                  "mb-6 flex items-start gap-3 rounded-xl p-4 text-sm",
+                  result.success
+                    ? "bg-green-50 text-green-800"
+                    : "bg-red-50 text-red-800"
+                )}
+              >
+                {result.success ? (
+                  <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-green-500" />
+                ) : (
+                  <AlertCircle className="mt-0.5 size-5 shrink-0 text-red-500" />
+                )}
+                <span>{result.message}</span>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground">
@@ -139,19 +184,19 @@ export function Consultation() {
                 <div className="flex flex-wrap gap-2">
                   {spaceTypes.map((type) => (
                     <button
-                      key={type}
+                      key={type.value}
                       type="button"
                       onClick={() =>
-                        setFormData({ ...formData, spaceType: type })
+                        setFormData({ ...formData, spaceType: type.value })
                       }
                       className={cn(
                         "rounded-full px-4 py-2 text-sm font-medium transition-all",
-                        formData.spaceType === type
+                        formData.spaceType === type.value
                           ? "bg-primary text-white"
                           : "bg-muted-light text-muted hover:bg-border hover:text-foreground"
                       )}
                     >
-                      {type}
+                      {type.label}
                     </button>
                   ))}
                 </div>
@@ -186,10 +231,17 @@ export function Consultation() {
               </div>
               <button
                 type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
+                disabled={isSubmitting}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:opacity-60"
               >
-                <Send className="size-4" />
-                무료 상담 신청하기
+                {isSubmitting ? (
+                  <>처리 중...</>
+                ) : (
+                  <>
+                    <Send className="size-4" />
+                    무료 상담 신청하기
+                  </>
+                )}
               </button>
               <p className="text-center text-xs text-muted">
                 상담 신청 후 영업일 기준 24시간 이내 연락드립니다

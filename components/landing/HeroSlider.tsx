@@ -5,75 +5,47 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const slides = [
-  {
-    id: 1,
-    category: "사무실",
-    title: "공간이 바뀌면,\n일이 달라집니다",
-    location: "대구 수성구",
-    area: "52평",
-    cost: "4,200만원",
-    image:
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&h=1080&fit=crop",
-  },
-  {
-    id: 2,
-    category: "학원",
-    title: "아이들의 집중력을\n높이는 공간 설계",
-    location: "대구 달서구",
-    area: "38평",
-    cost: "3,100만원",
-    image:
-      "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1920&h=1080&fit=crop",
-  },
-  {
-    id: 3,
-    category: "체육시설",
-    title: "운동에 몰입할 수 있는\n최적의 환경",
-    location: "대구 북구",
-    area: "65평",
-    cost: "5,800만원",
-    image:
-      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&h=1080&fit=crop",
-  },
-  {
-    id: 4,
-    category: "카페",
-    title: "브랜드를 담은\n감각적인 공간",
-    location: "대구 중구",
-    area: "28평",
-    cost: "2,600만원",
-    image:
-      "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=1920&h=1080&fit=crop",
-  },
-];
+interface Slide {
+  id: number;
+  category: string;
+  title: string;
+  location: string;
+  area: string;
+  cost: string;
+  image: string;
+}
 
-export function HeroSlider() {
+export function HeroSlider({ slides }: { slides: Slide[] }) {
   const [current, setCurrent] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const goTo = useCallback(
     (index: number) => {
-      if (isTransitioning) return;
+      if (isTransitioning || slides.length === 0) return;
       setIsTransitioning(true);
       setCurrent(index);
       setTimeout(() => setIsTransitioning(false), 700);
     },
-    [isTransitioning]
+    [isTransitioning, slides.length]
   );
 
   const next = useCallback(() => {
+    if (slides.length === 0) return;
     goTo((current + 1) % slides.length);
-  }, [current, goTo]);
+  }, [current, goTo, slides.length]);
 
   const prev = useCallback(() => {
+    if (slides.length === 0) return;
     goTo((current - 1 + slides.length) % slides.length);
-  }, [current, goTo]);
+  }, [current, goTo, slides.length]);
 
   useEffect(() => {
+    if (slides.length === 0) return;
     const timer = setInterval(next, 5000);
     return () => clearInterval(timer);
-  }, [next]);
+  }, [next, slides.length]);
+
+  if (slides.length === 0) return null;
 
   const slide = slides[current];
 

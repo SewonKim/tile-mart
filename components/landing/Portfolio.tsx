@@ -6,92 +6,23 @@ import Link from "next/link";
 import { ArrowRight, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const categories = ["전체", "사무실", "학원", "체육시설", "카페/음식점", "매장", "주거"];
+interface Project {
+  id: number;
+  category: string;
+  title: string;
+  location: string;
+  area: string;
+  cost: string;
+  image: string;
+}
 
-const projects = [
-  {
-    id: 1,
-    category: "사무실",
-    title: "IT 스타트업 오피스",
-    location: "대구 수성구",
-    area: "52평",
-    cost: "4,200만원",
-    image:
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop",
-  },
-  {
-    id: 2,
-    category: "학원",
-    title: "영어 전문 학원",
-    location: "대구 달서구",
-    area: "38평",
-    cost: "3,100만원",
-    image:
-      "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&h=600&fit=crop",
-  },
-  {
-    id: 3,
-    category: "체육시설",
-    title: "크로스핏 전문 센터",
-    location: "대구 북구",
-    area: "65평",
-    cost: "5,800만원",
-    image:
-      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
-  },
-  {
-    id: 4,
-    category: "카페/음식점",
-    title: "디저트 카페 브랜딩",
-    location: "대구 중구",
-    area: "28평",
-    cost: "2,600만원",
-    image:
-      "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop",
-  },
-  {
-    id: 5,
-    category: "매장",
-    title: "패션 편집숍 리뉴얼",
-    location: "대구 동구",
-    area: "34평",
-    cost: "2,900만원",
-    image:
-      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop",
-  },
-  {
-    id: 6,
-    category: "사무실",
-    title: "법률사무소 인테리어",
-    location: "대구 수성구",
-    area: "45평",
-    cost: "3,800만원",
-    image:
-      "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=800&h=600&fit=crop",
-  },
-  {
-    id: 7,
-    category: "주거",
-    title: "신축 아파트 리모델링",
-    location: "대구 달서구",
-    area: "32평",
-    cost: "3,500만원",
-    image:
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",
-  },
-  {
-    id: 8,
-    category: "학원",
-    title: "코딩 교육센터",
-    location: "대구 수성구",
-    area: "42평",
-    cost: "3,400만원",
-    image:
-      "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop",
-  },
-];
-
-export function Portfolio() {
+export function Portfolio({
+  projects,
+  categories,
+}: {
+  projects: Project[];
+  categories: string[];
+}) {
   const [activeCategory, setActiveCategory] = useState("전체");
 
   const filtered =

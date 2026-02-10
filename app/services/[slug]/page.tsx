@@ -2,21 +2,20 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Check, ArrowRight, Phone } from "lucide-react";
-import { services, projects } from "@/lib/data";
+import {
+  getPublicServiceBySlug,
+  getPublicServices,
+  getRelatedPortfolios,
+} from "@/lib/actions/public";
 
-export function generateStaticParams() {
-  return services.map((s) => ({ slug: s.slug }));
-}
-
-export function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  return params.then(({ slug }) => {
-    const service = services.find((s) => s.slug === slug);
-    if (!service) return {};
-    return {
-      title: `${service.title} 인테리어 | 타일마트`,
-      description: service.description,
-    };
-  });
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const result = await getPublicServiceBySlug(slug);
+  if (!result) return {};
+  return {
+    title: `${result.service.title} 인테리어 | 타일마트`,
+    description: result.service.tagline,
+  };
 }
 
 export default async function ServiceDetailPage({
@@ -25,24 +24,23 @@ export default async function ServiceDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
-  if (!service) notFound();
+  const result = await getPublicServiceBySlug(slug);
+  if (!result) notFound();
 
-  const categoryMap: Record<string, string> = {
-    office: "사무실",
-    academy: "학원",
-    fitness: "체육시설",
-    residential: "주거",
-    renovation: "환경개선",
-    retail: "매장",
-    fnb: "카페/음식점",
-  };
-  const relatedProjects = projects.filter(
-    (p) => p.category === categoryMap[slug] || p.category === service.title
-  );
+  const { service, features } = result;
 
-  const currentIndex = services.findIndex((s) => s.slug === slug);
-  const otherServices = services.filter((_, i) => i !== currentIndex);
+  const [relatedProjects, allServices] = await Promise.all([
+    getRelatedPortfolios(service.service_id, 3),
+    getPublicServices(),
+  ]);
+
+  const otherServices = allServices.filter((s) => s.slug !== slug);
+
+  // 서비스별 갤러리 이미지 (관련 시공사례 이미지 활용)
+  const galleryImages = relatedProjects
+    .filter((p) => p.thumbnail_url)
+    .map((p) => p.thumbnail_url as string)
+    .slice(0, 3);
 
   return (
     <div className="min-h-screen bg-white">
@@ -68,7 +66,7 @@ export default async function ServiceDetailPage({
       {/* 히어로 */}
       <div className="relative h-[50vh] w-full md:h-[60vh]">
         <Image
-          src={service.image}
+          src={service.image_url || ""}
           alt={service.title}
           fill
           className="object-cover"
@@ -102,42 +100,46 @@ export default async function ServiceDetailPage({
         </div>
 
         {/* 특징 리스트 */}
-        <div className="mx-auto mt-16 grid max-w-4xl gap-4 sm:grid-cols-2">
-          {service.features.map((feature, i) => (
-            <div
-              key={i}
-              className="flex items-start gap-3 rounded-xl bg-muted-light p-5 ring-1 ring-border/30"
-            >
+        {features.length > 0 && (
+          <div className="mx-auto mt-16 grid max-w-4xl gap-4 sm:grid-cols-2">
+            {features.map((feature) => (
               <div
-                className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full"
-                style={{ backgroundColor: `${service.color}1A` }}
+                key={feature.feature_id}
+                className="flex items-start gap-3 rounded-xl bg-muted-light p-5 ring-1 ring-border/30"
               >
-                <Check className="size-3.5" style={{ color: service.color }} />
-              </div>
-              <span className="text-sm font-medium">{feature}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* 갤러리 */}
-        <div className="mt-20">
-          <h2 className="mb-8 text-center text-2xl font-bold">시공 갤러리</h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {service.gallery.map((img, i) => (
-              <div
-                key={i}
-                className="group relative aspect-[4/3] overflow-hidden rounded-2xl"
-              >
-                <Image
-                  src={img}
-                  alt={`${service.title} 갤러리 ${i + 1}`}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                <div
+                  className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full"
+                  style={{ backgroundColor: `${service.color}1A` }}
+                >
+                  <Check className="size-3.5" style={{ color: service.color }} />
+                </div>
+                <span className="text-sm font-medium">{feature.content}</span>
               </div>
             ))}
           </div>
-        </div>
+        )}
+
+        {/* 갤러리 */}
+        {galleryImages.length > 0 && (
+          <div className="mt-20">
+            <h2 className="mb-8 text-center text-2xl font-bold">시공 갤러리</h2>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {galleryImages.map((img, i) => (
+                <div
+                  key={i}
+                  className="group relative aspect-[4/3] overflow-hidden rounded-2xl"
+                >
+                  <Image
+                    src={img}
+                    alt={`${service.title} 갤러리 ${i + 1}`}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* 관련 시공사례 */}
         {relatedProjects.length > 0 && (
@@ -146,15 +148,15 @@ export default async function ServiceDetailPage({
               {service.title} 시공사례
             </h2>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {relatedProjects.slice(0, 3).map((project) => (
+              {relatedProjects.map((project) => (
                 <Link
-                  key={project.id}
-                  href={`/portfolio/${project.id}`}
+                  key={project.portfolio_id}
+                  href={`/portfolio/${project.portfolio_id}`}
                   className="group overflow-hidden rounded-2xl ring-1 ring-border/50 transition-all hover:-translate-y-1 hover:shadow-lg"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <Image
-                      src={project.images[0]}
+                      src={project.thumbnail_url || ""}
                       alt={project.title}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
