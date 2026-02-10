@@ -36,18 +36,21 @@ export function PortfolioGallery({
 
       {/* 라이트박스 */}
       {lightboxIndex !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+          onClick={() => setLightboxIndex(null)}
+        >
           <button
             onClick={() => setLightboxIndex(null)}
-            className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+            className="absolute right-3 top-3 z-10 flex size-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 md:right-4 md:top-4"
           >
             <X className="size-5" />
           </button>
 
           {lightboxIndex > 0 && (
             <button
-              onClick={() => setLightboxIndex(lightboxIndex - 1)}
-              className="absolute left-4 flex size-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+              onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1); }}
+              className="absolute left-2 z-10 flex size-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 md:left-4"
             >
               <ChevronLeft className="size-5" />
             </button>
@@ -55,14 +58,17 @@ export function PortfolioGallery({
 
           {lightboxIndex < images.length - 1 && (
             <button
-              onClick={() => setLightboxIndex(lightboxIndex + 1)}
-              className="absolute right-4 flex size-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+              onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1); }}
+              className="absolute right-2 z-10 flex size-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 md:right-4"
             >
               <ChevronRight className="size-5" />
             </button>
           )}
 
-          <div className="relative h-[80vh] w-full max-w-5xl">
+          <div
+            className="relative h-[70vh] w-full max-w-5xl md:h-[80vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Image
               src={images[lightboxIndex]}
               alt={`${title} ${lightboxIndex + 1}`}
@@ -71,7 +77,7 @@ export function PortfolioGallery({
             />
           </div>
 
-          <div className="absolute bottom-6 text-sm text-white/60">
+          <div className="absolute bottom-4 text-sm text-white/60 md:bottom-6">
             {lightboxIndex + 1} / {images.length}
           </div>
         </div>

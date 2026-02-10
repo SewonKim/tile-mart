@@ -42,7 +42,7 @@ export function DataTable<T>({
               <th
                 key={col.key}
                 className={cn(
-                  'px-4 py-3 text-left text-xs font-semibold text-muted',
+                  'whitespace-nowrap px-4 py-3 text-left text-xs font-semibold text-muted',
                   col.width && `w-[${col.width}]`
                 )}
               >

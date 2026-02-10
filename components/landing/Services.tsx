@@ -126,7 +126,7 @@ export function Services({ services }: { services: ServiceItem[] }) {
           </div>
 
           {/* 벤토 그리드 */}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" style={{ gridAutoRows: "220px" }}>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" style={{ gridAutoRows: "minmax(180px, auto)" }}>
             {services.map((service, i) => {
               const Icon = iconMap[service.slug] || Building2;
               return (

@@ -75,14 +75,15 @@ export default async function DashboardPage() {
           </Link>
         </div>
         {stats?.recentConsultations && stats.recentConsultations.length > 0 ? (
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-gray-50">
-                <th className="px-5 py-2.5 text-left text-xs font-semibold text-muted">이름</th>
-                <th className="px-5 py-2.5 text-left text-xs font-semibold text-muted">연락처</th>
-                <th className="px-5 py-2.5 text-left text-xs font-semibold text-muted">공간유형</th>
-                <th className="px-5 py-2.5 text-left text-xs font-semibold text-muted">상태</th>
-                <th className="px-5 py-2.5 text-left text-xs font-semibold text-muted">담당자</th>
+                <th className="whitespace-nowrap px-5 py-2.5 text-left text-xs font-semibold text-muted">이름</th>
+                <th className="whitespace-nowrap px-5 py-2.5 text-left text-xs font-semibold text-muted">연락처</th>
+                <th className="whitespace-nowrap px-5 py-2.5 text-left text-xs font-semibold text-muted">공간유형</th>
+                <th className="whitespace-nowrap px-5 py-2.5 text-left text-xs font-semibold text-muted">상태</th>
+                <th className="whitespace-nowrap px-5 py-2.5 text-left text-xs font-semibold text-muted">담당자</th>
               </tr>
             </thead>
             <tbody>
@@ -108,6 +109,7 @@ export default async function DashboardPage() {
               ))}
             </tbody>
           </table>
+          </div>
         ) : (
           <div className="py-12 text-center text-sm text-muted">
             아직 상담 신청이 없습니다.
